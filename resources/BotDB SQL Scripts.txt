@@ -1,0 +1,56 @@
+CREATE DATABASE BotDB;
+
+CREATE TABLE GuildSettings (
+	guild_id bigint,
+	CONSTRAINT PK_Setting PRIMARY KEY (guild_id)
+);
+
+CREATE TABLE Autoroles (
+	role_id bigint,
+	guild_id bigint NOT NULL,
+	CONSTRAINT PK_Autorole PRIMARY KEY (role_id),
+	CONSTRAINT FK_Setting_Autorole FOREIGN KEY (guild_id)
+    	REFERENCES GuildSettings(guild_id)
+	ON DELETE CASCADE
+);
+
+CREATE TABLE GuildMessages (
+	guild_id bigint,
+	message_type varchar(7),
+	channel_id bigint NOT NULL,
+	message_text nvarchar(2000) NOT NULL
+	CONSTRAINT PK_Message PRIMARY KEY (guild_id, message_type),
+	CONSTRAINT FK_Setting_Message FOREIGN KEY (guild_id)
+    	REFERENCES GuildSettings(guild_id)
+	ON DELETE CASCADE
+);
+
+CREATE TABLE Toggles (
+	guild_id bigint,
+	toggle_type varchar(9),
+	CONSTRAINT PK_Toggle PRIMARY KEY (guild_id, toggle_type),
+	CONSTRAINT FK_Setting_Toggle FOREIGN KEY (guild_id)
+    	REFERENCES GuildSettings(guild_id)
+	ON DELETE CASCADE
+);
+
+CREATE TABLE ReactMessages (
+	message_id bigint,
+	guild_id bigint NOT NULL,
+	channel_id bigint NOT NULL,
+	grouped bit NOT NULL DEFAULT 0,
+	CONSTRAINT PK_ReactMessage PRIMARY KEY (message_id),
+	CONSTRAINT FK_Setting_ReactMessage FOREIGN KEY (guild_id)
+    	REFERENCES GuildSettings(guild_id)
+	ON DELETE CASCADE
+);
+
+CREATE TABLE ReactRoles (
+	message_id bigint,
+	role_id bigint,
+	emote nvarchar(20),
+	CONSTRAINT PK_ReactRole PRIMARY KEY (message_id, role_id, emote),
+	CONSTRAINT FK_ReactMessage_ReactRole FOREIGN KEY (message_id)
+    	REFERENCES ReactMessages(message_id)
+	ON DELETE CASCADE
+);
